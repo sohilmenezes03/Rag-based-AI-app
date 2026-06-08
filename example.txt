@@ -1,0 +1,3 @@
+This is a sample document for the RAG app.
+
+Add your own .txt and .pdf files to this docs folder, then ask questions over them in the Streamlit UI.

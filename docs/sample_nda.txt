@@ -1,0 +1,32 @@
+SAMPLE NON-DISCLOSURE AGREEMENT
+For demo/RAG testing only. This is fictional text and is not legal advice.
+
+1. PURPOSE
+This Non-Disclosure Agreement is made to protect confidential information shared for discussion of a possible software development project.
+
+2. DISCLOSING PARTY
+The party sharing confidential information is called the Disclosing Party.
+
+3. RECEIVING PARTY
+The party receiving confidential information is called the Receiving Party.
+
+4. CONFIDENTIAL INFORMATION
+Confidential Information includes business plans, source code, product designs, customer data, pricing, technical documents, passwords, and internal processes.
+
+5. OBLIGATIONS
+The Receiving Party shall use Confidential Information only for the stated purpose and shall not disclose it to any third party without written consent.
+
+6. EXCLUSIONS
+Information is not confidential if it is already public, already known to the Receiving Party, independently developed, or received lawfully from another source.
+
+7. DURATION
+The confidentiality obligations shall continue for 3 years from the date of disclosure.
+
+8. RETURN OR DESTRUCTION
+Upon request, the Receiving Party shall return or destroy confidential materials.
+
+9. REMEDIES
+Unauthorized disclosure may cause harm, and the Disclosing Party may seek legal remedies available under applicable law.
+
+10. DISCLAIMER
+This sample NDA is created only for software project testing and should not be used as a real legal document.

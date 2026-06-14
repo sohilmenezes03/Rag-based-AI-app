@@ -1,0 +1,35 @@
+SAMPLE RESIDENTIAL RENTAL AGREEMENT
+For demo/RAG testing only. This is fictional text and is not legal advice.
+
+1. PARTIES
+This Rental Agreement is made between the Landlord, Mr. Arun Naik, and the Tenant, Ms. Rhea D'Souza.
+
+2. PROPERTY
+The property is a residential apartment located at Flat 204, Green Valley Apartments, Margao, Goa.
+
+3. TERM
+The tenancy begins on 1 July 2026 and ends on 30 June 2027 unless renewed in writing by both parties.
+
+4. RENT
+The Tenant shall pay monthly rent of INR 18,000 on or before the 5th day of each month. Rent shall be paid by bank transfer.
+
+5. SECURITY DEPOSIT
+The Tenant shall pay a refundable security deposit of INR 36,000. The Landlord may deduct unpaid rent, utility charges, or repair costs caused by the Tenant.
+
+6. USE OF PROPERTY
+The property shall be used only for residential purposes. The Tenant shall not use the property for illegal activity or commercial operations.
+
+7. MAINTENANCE
+The Tenant shall keep the property clean and shall inform the Landlord about major repairs. Minor day-to-day maintenance shall be the Tenant's responsibility.
+
+8. TERMINATION
+Either party may terminate this Agreement by giving 30 days' written notice. If the Tenant leaves without notice, one month's rent may be deducted from the security deposit.
+
+9. SUBLETTING
+The Tenant shall not sublet the property or transfer possession to another person without written permission from the Landlord.
+
+10. DISPUTE RESOLUTION
+The parties shall first try to resolve disputes through discussion. If unresolved, disputes may be referred to mediation or a court having jurisdiction in Goa.
+
+11. DISCLAIMER
+This sample agreement is created only for software project testing and should not be used as a real legal document.

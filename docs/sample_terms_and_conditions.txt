@@ -1,0 +1,35 @@
+SAMPLE TERMS AND CONDITIONS
+For demo/RAG testing only. This is fictional text and is not legal advice.
+
+1. ACCEPTANCE OF TERMS
+By using the DemoMart website or app, users agree to these Terms and Conditions.
+
+2. USER ACCOUNT
+Users must provide accurate information while creating an account. Users are responsible for keeping their login credentials confidential.
+
+3. ORDERS
+An order is confirmed only after successful payment and acceptance by DemoMart. DemoMart may cancel orders due to stock issues, pricing errors, or suspected fraud.
+
+4. PRICING
+Prices displayed may include or exclude taxes as specified on the product page. Prices may change without prior notice.
+
+5. DELIVERY
+Delivery timelines are estimates and may vary due to location, weather, logistics, or public holidays.
+
+6. RETURNS AND REFUNDS
+Eligible products may be returned within 7 days of delivery if unused and in original condition. Refunds may take 5 to 10 business days after approval.
+
+7. PROHIBITED USE
+Users shall not misuse the platform, attempt unauthorized access, upload harmful code, or use the service for illegal activity.
+
+8. LIMITATION OF LIABILITY
+DemoMart shall not be liable for indirect, incidental, or consequential losses arising from use of the platform.
+
+9. GOVERNING LAW
+These Terms shall be governed by the laws of India.
+
+10. DISPUTE RESOLUTION
+The parties shall attempt to resolve disputes amicably. Unresolved disputes may be submitted to courts having jurisdiction in Goa, India.
+
+11. DISCLAIMER
+These sample terms are created only for software project testing and should not be used as a real legal document.

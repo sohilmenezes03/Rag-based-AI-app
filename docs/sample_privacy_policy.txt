@@ -1,0 +1,35 @@
+SAMPLE PRIVACY POLICY
+For demo/RAG testing only. This is fictional text and is not legal advice.
+
+1. INTRODUCTION
+This Privacy Policy explains how DemoMart collects, uses, stores, and protects user information.
+
+2. INFORMATION COLLECTED
+DemoMart may collect name, email address, phone number, delivery address, order history, payment status, and device information.
+
+3. PURPOSE OF PROCESSING
+User information may be used to create accounts, process orders, provide customer support, improve services, prevent fraud, and send service updates.
+
+4. PAYMENT DATA
+DemoMart does not store full card numbers. Payment processing may be handled by third-party payment service providers.
+
+5. SHARING OF DATA
+DemoMart may share limited information with delivery partners, payment processors, cloud hosting providers, and legal authorities when required by law.
+
+6. DATA RETENTION
+User data may be retained as long as necessary for service delivery, legal compliance, fraud prevention, and business records.
+
+7. USER RIGHTS
+Users may request access, correction, or deletion of their personal information by contacting support.
+
+8. SECURITY
+DemoMart uses reasonable technical and organizational safeguards to protect user data. However, no system is completely secure.
+
+9. CHILDREN
+The service is not intended for users below 18 years of age.
+
+10. CONTACT
+For privacy questions, users may contact privacy@demomart.example.
+
+11. DISCLAIMER
+This sample privacy policy is created only for software project testing and should not be used as a real legal document.

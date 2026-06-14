@@ -1,0 +1,35 @@
+SAMPLE EMPLOYMENT AGREEMENT
+For demo/RAG testing only. This is fictional text and is not legal advice.
+
+1. PARTIES
+This Employment Agreement is between TechNova Solutions Pvt. Ltd. and the Employee, Mr. Sameer Fernandes.
+
+2. POSITION
+The Employee shall work as a Junior Software Developer.
+
+3. START DATE
+Employment begins on 1 August 2026.
+
+4. COMPENSATION
+The Employee shall receive a salary of INR 45,000 per month, subject to applicable taxes and deductions.
+
+5. WORKING HOURS
+The standard working hours are 9:30 AM to 6:30 PM from Monday to Friday.
+
+6. PROBATION
+The Employee shall be on probation for three months. During probation, either party may terminate employment by giving 7 days' written notice.
+
+7. CONFIDENTIALITY
+The Employee shall not disclose confidential business, technical, financial, or client information of the Company during or after employment.
+
+8. INTELLECTUAL PROPERTY
+All software, code, documentation, designs, and inventions created by the Employee during employment and related to Company work shall belong to the Company.
+
+9. TERMINATION
+After probation, either party may terminate employment by giving 30 days' written notice or salary in lieu of notice.
+
+10. NON-SOLICITATION
+For 12 months after leaving employment, the Employee shall not directly solicit the Company's clients using confidential information gained during employment.
+
+11. DISCLAIMER
+This sample agreement is created only for software project testing and should not be used as a real legal document.

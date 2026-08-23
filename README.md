@@ -66,32 +66,47 @@ Features
 - Displays retrieved source chunks and reranker scores.
 - Includes a small evaluation script for testing retrieval quality.
 
-Retrieval Pipeline
+## Retrieval Pipeline
 
 The application uses a multi-stage retrieval pipeline:
 
+```text
 User Query
-    ↓
-BM25 Retrieval
-    +
-FAISS Semantic Retrieval
-    ↓
-Weighted Ensemble
-    ↓
-Top Candidate Chunks
-    ↓
-Cross-Encoder Reranking
-    ↓
-Relevance Filtering
-    ↓
+    │
+    ▼
+┌─────────────────────────────┐
+│      Hybrid Retrieval       │
+│                             │
+│  BM25 + FAISS Semantic      │
+│        Retrieval            │
+└──────────────┬──────────────┘
+               │
+               ▼
+      Weighted Ensemble
+               │
+               ▼
+     Top Candidate Chunks
+               │
+               ▼
+    Cross-Encoder Reranking
+               │
+               ▼
+      Relevance Filtering
+               │
+               ▼
 Same-Document Context Preservation
-    ↓
-Relevant Context
-    ↓
-Google Gemini
-    ↓
+               │
+               ▼
+       Relevant Context
+               │
+               ▼
+       Google Gemini
+               │
+               ▼
 Final Answer with Source Attribution
-Why Multiple Retrievers?
+```
+
+### Why Multiple Retrievers?
 
 BM25 is useful for exact keyword matching.
 

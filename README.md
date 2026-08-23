@@ -4,7 +4,9 @@ A Retrieval-Augmented Generation (RAG) application that allows users to ask ques
 
 The application combines keyword-based retrieval, semantic search, ensemble retrieval, cross-encoder reranking, and Google Gemini to generate answers grounded in the provided documents.
 
-Architecture
+ ## Architecture
+
+```text
                     ┌─────────────────┐
                     │  Local Documents │
                     │  TXT / PDF Files │
@@ -50,6 +52,7 @@ Architecture
                              │
                              ▼
                     Answer + Source Chunks
+```
 Features
 - Supports .txt and .pdf documents.
 - Splits documents into overlapping chunks.

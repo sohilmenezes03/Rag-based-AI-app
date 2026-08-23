@@ -111,18 +111,23 @@ The reranker evaluates the relationship between the user query and each retrieve
 
 The system also applies relevance filtering while allowing useful additional chunks from the same source document to be preserved as context.
 
-Tech Stack
+## Tech Stack
 
-Python
-Streamlit
-Google Gemini
-Sentence Transformers
-FAISS
-BM25
-Cross-Encoder Reranking
-PyPDF
-NumPy
-Project Structure
+| Category | Technologies |
+|---|---|
+| **Language** | Python |
+| **Frontend / UI** | Streamlit |
+| **LLM** | Google Gemini |
+| **Embeddings** | Sentence Transformers |
+| **Vector Search** | FAISS |
+| **Keyword Retrieval** | BM25 |
+| **Reranking** | Cross-Encoder |
+| **Document Processing** | PyPDF |
+| **Numerical Computing** | NumPy |
+
+## Project Structure
+
+```text
 first-rag-based-agentic-ai/
 │
 ├── main.py

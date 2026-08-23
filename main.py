@@ -8,10 +8,11 @@ import faiss
 import numpy as np
 import streamlit as st
 from dotenv import load_dotenv
-from google import generativeai as genai
+from google import genai
+from google.genai import types
 from pypdf import PdfReader
 from rank_bm25 import BM25Okapi
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer, CrossEncoder
 
 
 @dataclass
@@ -24,28 +25,109 @@ def tokenize_text(text: str) -> List[str]:
     return [token for token in re.findall(r"\w+", text.lower()) if token]
 
 
+def chunk_text(
+    text: str,
+    chunk_size: int = 1000,
+    overlap: int = 150
+) -> List[str]:
+
+    text = re.sub(r"\s+", " ", text).strip()
+
+    if not text:
+        return []
+
+    sentences = re.split(
+        r"(?<=[.!?])\s+",
+        text
+    )
+
+    chunks = []
+    current_chunk = []
+    current_length = 0
+
+    for sentence in sentences:
+        sentence = sentence.strip()
+
+        if not sentence:
+            continue
+
+        sentence_length = len(sentence)
+
+        if (
+            current_chunk
+            and current_length + sentence_length + 1 > chunk_size
+        ):
+            chunks.append(
+                " ".join(current_chunk)
+            )
+
+            overlap_text = " ".join(current_chunk)
+            overlap_text = overlap_text[-overlap:]
+
+            current_chunk = [overlap_text]
+            current_length = len(overlap_text)
+
+        current_chunk.append(sentence)
+        current_length += sentence_length + 1
+
+    if current_chunk:
+        chunks.append(
+            " ".join(current_chunk)
+        )
+
+    return chunks
+
 def load_documents(docs_path: str) -> List[Document]:
     documents: List[Document] = []
     root = Path(docs_path)
 
     for path in sorted(root.rglob("*")):
+
         if path.suffix.lower() == ".txt":
             try:
-                text = path.read_text(encoding="utf-8", errors="ignore").strip()
+                text = path.read_text(
+                    encoding="utf-8",
+                    errors="ignore"
+                ).strip()
             except Exception:
                 continue
-            if text:
-                documents.append(Document(page_content=text, metadata={"source": str(path)}))
+
+            chunks = chunk_text(text)
+
+            for chunk_index, chunk in enumerate(chunks):
+                documents.append(
+                    Document(
+                        page_content=chunk,
+                        metadata={
+                            "source": str(path),
+                            "chunk": str(chunk_index),
+                        },
+                    )
+                )
 
         elif path.suffix.lower() == ".pdf":
             try:
                 reader = PdfReader(path)
-                pages = [page.extract_text() or "" for page in reader.pages]
-                text = "\n\n".join(pages).strip()
+
+                for page_number, page in enumerate(reader.pages, start=1):
+                    text = page.extract_text() or ""
+
+                    chunks = chunk_text(text)
+
+                    for chunk_index, chunk in enumerate(chunks):
+                        documents.append(
+                            Document(
+                                page_content=chunk,
+                                metadata={
+                                    "source": str(path),
+                                    "page": str(page_number),
+                                    "chunk": str(chunk_index),
+                                },
+                            )
+                        )
+
             except Exception:
                 continue
-            if text:
-                documents.append(Document(page_content=text, metadata={"source": str(path)}))
 
     return documents
 
@@ -87,10 +169,18 @@ class FaissRetriever:
         self.index.add(self.embeddings)
 
     def _embed_texts(self, texts: List[str]) -> np.ndarray:
-        embeddings = self.embedder.encode(texts, convert_to_numpy=True, normalize_embeddings=True)
+        embeddings = self.embedder.encode(
+            texts,
+            convert_to_numpy=True,
+            normalize_embeddings=True
+        )
         return embeddings.astype("float32")
 
-    def get_relevant_documents(self, query: str) -> List[Document]:
+    def get_relevant_documents(
+        self,
+        query: str,
+        min_score: float = 0.25
+    ) -> List[Document]:
         if not query.strip():
             return []
 
@@ -98,72 +188,241 @@ class FaissRetriever:
         distances, indices = self.index.search(query_embedding, self.k)
 
         results: List[Document] = []
+
         for score, idx in zip(distances[0], indices[0]):
             if idx < 0 or idx >= len(self.documents):
                 continue
+
+            if float(score) < min_score:
+                continue
+
             doc = self.documents[idx]
-            metadata = {**doc.metadata, "score": f"{float(score):.4f}"}
-            results.append(Document(page_content=doc.page_content, metadata=metadata))
+
+            metadata = {
+                **doc.metadata,
+                "score": f"{float(score):.4f}"
+            }
+
+            results.append(
+                Document(
+                    page_content=doc.page_content,
+                    metadata=metadata
+                )
+            )
 
         return results
 
 
 class EnsembleRetriever:
-    def __init__(self, retrievers: List[object], weights: Optional[List[float]] = None):
+    def __init__(
+        self,
+        retrievers: List[object],
+        weights: Optional[List[float]] = None,
+        k: int = 3,
+        rrf_k: int = 60,
+    ):
         self.retrievers = retrievers
         self.weights = weights or [1.0] * len(retrievers)
+        self.k = k
+        self.rrf_k = rrf_k
 
     @staticmethod
-    def _get_score(doc: Document) -> float:
-        raw_score = doc.metadata.get("score", "0")
-        try:
-            return float(raw_score)
-        except (ValueError, TypeError):
-            return 0.0
+    def _doc_id(doc: Document, fallback_index: int) -> str:
+        source = doc.metadata.get("source", "unknown")
+        chunk = doc.metadata.get(
+            "chunk",
+            doc.metadata.get("chunk_id", fallback_index)
+        )
+        return f"{source}::{chunk}"
 
     def get_relevant_documents(self, query: str) -> List[Document]:
-        scored_documents: Dict[str, Document] = {}
+        fused_scores: Dict[str, float] = {}
+        documents: Dict[str, Document] = {}
 
         for retriever, weight in zip(self.retrievers, self.weights):
-            for doc in retriever.get_relevant_documents(query):
-                source = doc.metadata.get("source", "unknown")
-                score = self._get_score(doc) * weight
-                existing = scored_documents.get(source)
-                if existing is None or score > self._get_score(existing):
-                    merged_metadata = {**doc.metadata, "ensemble_score": f"{score:.4f}"}
-                    scored_documents[source] = Document(page_content=doc.page_content, metadata=merged_metadata)
+            results = retriever.get_relevant_documents(query)
 
-        sorted_docs = sorted(
-            scored_documents.values(),
-            key=lambda doc: self._get_score(doc),
+            for rank, doc in enumerate(results, start=1):
+                doc_id = self._doc_id(doc, rank)
+
+                rrf_score = weight / (self.rrf_k + rank)
+
+                fused_scores[doc_id] = (
+                    fused_scores.get(doc_id, 0.0) + rrf_score
+                )
+
+                if doc_id not in documents:
+                    documents[doc_id] = doc
+
+        ranked_ids = sorted(
+            fused_scores,
+            key=fused_scores.get,
+            reverse=True
+        )
+
+        results = []
+
+        for doc_id in ranked_ids:
+            doc = documents[doc_id]
+
+            metadata = {
+                **doc.metadata,
+                "ensemble_score": f"{fused_scores[doc_id]:.6f}",
+            }
+
+            results.append(
+                Document(
+                    page_content=doc.page_content,
+                    metadata=metadata
+                )
+            )
+
+            if len(results) >= self.k:
+                break
+
+        return results
+class Reranker:
+    def __init__(
+        self,
+        model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        k: int = 3,
+        max_score_gap: float = 4.0,
+        max_chunks_per_source: int = 2,
+    ):
+        self.model = CrossEncoder(model_name)
+        self.k = k
+        self.max_score_gap = max_score_gap
+        self.max_chunks_per_source = max_chunks_per_source
+
+    def get_relevant_documents(
+        self,
+        query: str,
+        documents: List[Document],
+    ) -> List[Document]:
+
+        if not documents:
+            return []
+
+        pairs = [
+            [query, doc.page_content]
+            for doc in documents
+        ]
+
+        scores = self.model.predict(pairs)
+
+        ranked = sorted(
+            zip(documents, scores),
+            key=lambda item: float(item[1]),
             reverse=True,
         )
-        return sorted_docs[:5]
 
+        best_score = float(ranked[0][1])
+        best_source = ranked[0][0].metadata.get(
+            "source",
+            "unknown"
+        )
 
-def configure_gemini(api_key: str) -> None:
+        results = []
+        source_counts = {}
+
+        for doc, score in ranked:
+            score = float(score)
+            source = doc.metadata.get("source", "unknown")
+
+            # Always keep the best result.
+            if not results:
+                keep = True
+
+            # Allow another chunk from the same document
+            # as the best result.
+            elif source == best_source:
+                keep = True
+
+            # For other documents, only keep them if
+            # their score is close enough to the best score.
+            elif (best_score - score) <= self.max_score_gap:
+                keep = True
+
+            else:
+                keep = False
+
+            if not keep:
+                continue
+
+            # Do not take too many chunks from one document.
+            if source_counts.get(source, 0) >= self.max_chunks_per_source:
+                continue
+
+            metadata = {
+                **doc.metadata,
+                "reranker_score": f"{score:.4f}",
+            }
+
+            results.append(
+                Document(
+                    page_content=doc.page_content,
+                    metadata=metadata,
+                )
+            )
+
+            source_counts[source] = (
+                source_counts.get(source, 0) + 1
+            )
+
+            if len(results) >= self.k:
+                break
+
+        return results
+
+def configure_gemini(api_key: str):
     if not api_key:
-        raise ValueError("GOOGLE_API_KEY must be set in the environment.")
-    genai.configure(api_key=api_key)
+        raise ValueError(
+            "GOOGLE_API_KEY must be set in the environment."
+        )
+
+    return genai.Client(api_key=api_key)
 
 
-def generate_answer(prompt: str, model_name: str = "gemini-3.5-flash", temperature: float = 0.2) -> str:
-    model = genai.GenerativeModel(model_name=model_name)
-    generation_config = genai.GenerationConfig(temperature=temperature)
-    response = model.generate_content(prompt, generation_config=generation_config)
-    return getattr(response, "text", str(response))
+def generate_answer(
+    client,
+    prompt: str,
+    model_name: str = "gemini-3.5-flash",
+    temperature: float = 0.2,
+) -> str:
+    response = client.models.generate_content(
+        model=model_name,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            temperature=temperature
+        ),
+    )
+
+    return response.text
 
 
 def build_rag_resources(docs_path: str, google_api_key: str):
     documents = load_documents(docs_path)
-    if not documents:
-        raise ValueError(f"No documents found in {docs_path}. Place .txt or .pdf files inside the docs folder.")
 
-    configure_gemini(google_api_key)
-    bm25_retriever = BM25Retriever(documents, k=4)
-    faiss_retriever = FaissRetriever(documents, k=4)
-    ensemble_retriever = EnsembleRetriever(retrievers=[bm25_retriever, faiss_retriever], weights=[0.6, 0.4])
-    return ensemble_retriever
+    if not documents:
+        raise ValueError(
+            f"No documents found in {docs_path}. "
+            "Place .txt or .pdf files inside the docs folder."
+        )
+
+    client = configure_gemini(google_api_key)
+
+    bm25_retriever = BM25Retriever(documents, k=5)
+    faiss_retriever = FaissRetriever(documents, k=5)
+
+    ensemble_retriever = EnsembleRetriever(
+        retrievers=[bm25_retriever, faiss_retriever],
+        weights=[0.3, 0.7],
+        k=5
+    )
+
+    reranker = Reranker(k=3)
+
+    return ensemble_retriever, reranker, client
 
 
 def build_prompt(query: str, documents: List[Document]) -> str:
@@ -175,13 +434,29 @@ def build_prompt(query: str, documents: List[Document]) -> str:
 
     for idx, doc in enumerate(documents, start=1):
         source = doc.metadata.get("source", "unknown")
+        page = doc.metadata.get("page")
+        chunk = doc.metadata.get("chunk")
+
+        source_info = f"Source: {Path(source).name}"
+
+        if page:
+            source_info += f"\nPage: {page}"
+
+        if chunk is not None:
+            source_info += f"\nChunk: {chunk}"
+
         excerpt = doc.page_content.strip()
+
         if len(excerpt) > 1200:
             excerpt = excerpt[:1200].rstrip() + "..."
-        prompt_lines.append(f"Source {idx}: {source}\n{excerpt}\n")
+
+        prompt_lines.append(
+            f"{source_info}\n\n{excerpt}\n"
+        )
 
     prompt_lines.append(f"Question: {query}\n")
     prompt_lines.append("Answer:")
+
     return "\n".join(prompt_lines)
 
 
@@ -215,7 +490,10 @@ def main():
     if query:
         with st.spinner("Loading documents and building the retriever..."):
             try:
-                retriever = get_resources(docs_path, google_api_key)
+                retriever, reranker, client = get_resources(
+                    docs_path,
+                    google_api_key
+                )
             except Exception as exc:
                 st.error(f"Error creating RAG resources: {exc}")
                 return
@@ -227,20 +505,56 @@ def main():
             st.warning("No relevant documents found for your question.")
             return
 
+        with st.spinner("Reranking retrieved chunks..."):
+            retrieved_docs = reranker.get_relevant_documents(
+                query,
+                retrieved_docs
+            )
+
+        if not retrieved_docs:
+            st.warning("No relevant documents remained after reranking.")
+            return
+
         prompt = build_prompt(query, retrieved_docs)
 
-        with st.spinner("Generating answer with Gemini 3.5 Flash..."):
-            answer = generate_answer(prompt)
+        try:
+            with st.spinner("Generating answer with Gemini 3.5 Flash..."):
+                answer = generate_answer(
+                    client,
+                    prompt
+                )
+        except Exception as exc:
+            st.error(f"Error generating answer: {exc}")
+            return
 
         st.subheader("Answer")
         st.write(answer)
 
         st.subheader("Source chunks")
+
         for idx, doc in enumerate(retrieved_docs, start=1):
             source = doc.metadata.get("source", "unknown")
+            page = doc.metadata.get("page")
+            chunk = doc.metadata.get("chunk")
+            reranker_score = doc.metadata.get("reranker_score", "N/A")
+
+            source_name = Path(source).name
+
+            label = f"Source {idx}: {source_name}"
+
+            if page:
+                label += f" | Page {page}"
+
+            if chunk is not None:
+                label += f" | Chunk {chunk}"
+
+            label += f" | Reranker Score: {reranker_score}"
+
             content = doc.page_content.strip()
-            with st.expander(f"Source {idx}: {source}"):
+
+            with st.expander(label):
                 st.write(content)
+
     else:
         st.info("Enter a query above to start the RAG retrieval process.")
 

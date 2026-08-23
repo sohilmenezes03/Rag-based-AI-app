@@ -4,6 +4,10 @@ A Retrieval-Augmented Generation (RAG) application that allows users to ask ques
 
 The application combines keyword-based retrieval, semantic search, ensemble retrieval, cross-encoder reranking, and Google Gemini to generate answers grounded in the provided documents.
 
+## Demo
+
+![RAG Application Demo](assets/rag-demo.png)
+
  ## Architecture
 
 ```text

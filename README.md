@@ -1,10 +1,12 @@
- Python RAG Application
+# Python RAG Application
 
 A Retrieval-Augmented Generation (RAG) application that allows users to ask questions about local .txt and .pdf documents.
 
 The application combines keyword-based retrieval, semantic search, ensemble retrieval, cross-encoder reranking, and Google Gemini to generate answers grounded in the provided documents.
 
-Architecture
+ ## Architecture
+
+```text
                     ┌─────────────────┐
                     │  Local Documents │
                     │  TXT / PDF Files │
@@ -50,6 +52,7 @@ Architecture
                              │
                              ▼
                     Answer + Source Chunks
+```
 Features
 - Supports .txt and .pdf documents.
 - Splits documents into overlapping chunks.
@@ -63,32 +66,47 @@ Features
 - Displays retrieved source chunks and reranker scores.
 - Includes a small evaluation script for testing retrieval quality.
 
-Retrieval Pipeline
+## Retrieval Pipeline
 
 The application uses a multi-stage retrieval pipeline:
 
+```text
 User Query
-    ↓
-BM25 Retrieval
-    +
-FAISS Semantic Retrieval
-    ↓
-Weighted Ensemble
-    ↓
-Top Candidate Chunks
-    ↓
-Cross-Encoder Reranking
-    ↓
-Relevance Filtering
-    ↓
+    │
+    ▼
+┌─────────────────────────────┐
+│      Hybrid Retrieval       │
+│                             │
+│  BM25 + FAISS Semantic      │
+│        Retrieval            │
+└──────────────┬──────────────┘
+               │
+               ▼
+      Weighted Ensemble
+               │
+               ▼
+     Top Candidate Chunks
+               │
+               ▼
+    Cross-Encoder Reranking
+               │
+               ▼
+      Relevance Filtering
+               │
+               ▼
 Same-Document Context Preservation
-    ↓
-Relevant Context
-    ↓
-Google Gemini
-    ↓
+               │
+               ▼
+       Relevant Context
+               │
+               ▼
+       Google Gemini
+               │
+               ▼
 Final Answer with Source Attribution
-Why Multiple Retrievers?
+```
+
+### Why Multiple Retrievers?
 
 BM25 is useful for exact keyword matching.
 
@@ -108,18 +126,23 @@ The reranker evaluates the relationship between the user query and each retrieve
 
 The system also applies relevance filtering while allowing useful additional chunks from the same source document to be preserved as context.
 
-Tech Stack
+## Tech Stack
 
-Python
-Streamlit
-Google Gemini
-Sentence Transformers
-FAISS
-BM25
-Cross-Encoder Reranking
-PyPDF
-NumPy
-Project Structure
+| Category | Technologies |
+|---|---|
+| **Language** | Python |
+| **Frontend / UI** | Streamlit |
+| **LLM** | Google Gemini |
+| **Embeddings** | Sentence Transformers |
+| **Vector Search** | FAISS |
+| **Keyword Retrieval** | BM25 |
+| **Reranking** | Cross-Encoder |
+| **Document Processing** | PyPDF |
+| **Numerical Computing** | NumPy |
+
+## Project Structure
+
+```text
 first-rag-based-agentic-ai/
 │
 ├── main.py

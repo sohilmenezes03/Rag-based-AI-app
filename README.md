@@ -1,4 +1,4 @@
- Python RAG Application
+# Python RAG Application
 
 A Retrieval-Augmented Generation (RAG) application that allows users to ask questions about local .txt and .pdf documents.
 

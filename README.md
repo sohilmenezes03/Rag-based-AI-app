@@ -160,8 +160,9 @@ first-rag-based-agentic-ai/
 │   ├── sample_nda.txt
 │   └── ...
 └── venv/
+```
 
-.env and venv/ should not be pushed to GitHub.
+`.env` and `venv/` should not be pushed to GitHub.
 
 ## Setup
 

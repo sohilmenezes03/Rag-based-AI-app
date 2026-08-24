@@ -163,34 +163,40 @@ first-rag-based-agentic-ai/
 
 .env and venv/ should not be pushed to GitHub.
 
-Setup
+## Setup
 
-1. Clone the repository
-git clone <your-repository-url>
-cd first-rag-based-agentic-ai
-2. Create a virtual environment
-python -m venv venv
+1. **Open a terminal in the project root.**
 
-Activate it:
+2. **Create and activate a virtual environment:**
 
-.\venv\Scripts\Activate.ps1
-3. Install dependencies
-pip install -r requirements.txt
-4. Configure environment variables
+   ```powershell
+   python -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   ```
 
-Create a .env file:
+3. **Install dependencies:**
 
-GOOGLE_API_KEY=your_google_api_key
-DOCS_PATH=docs
-5. Add documents
+   ```powershell
+   pip install -r requirements.txt
+   ```
 
-Place .txt or .pdf files inside:
+4. **Configure environment variables:**
 
-docs/
-Running the Application
+   Copy `.env.example` to `.env` and add your Google API key.
+
+   ```text
+   GOOGLE_API_KEY=your_google_api_key
+   ```
+
+5. **Add documents:**
+
+   Place `.txt` or `.pdf` files inside the `docs/` folder.
+
+## Run
+
+```powershell
 streamlit run main.py
-
-Then open the local URL displayed by Streamlit.
+```
 
 Evaluation
 

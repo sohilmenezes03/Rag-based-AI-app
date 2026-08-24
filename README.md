@@ -169,24 +169,24 @@ first-rag-based-agentic-ai/
 
 2. **Create and activate a virtual environment:**
 
-   ```powershell
+```powershell
    python -m venv .venv
    .\.venv\Scripts\Activate.ps1
-   ```
+```
 
 3. **Install dependencies:**
 
-   ```powershell
+```powershell
    pip install -r requirements.txt
-   ```
+```
 
 4. **Configure environment variables:**
 
    Copy `.env.example` to `.env` and add your Google API key.
 
-   ```text
+```text
    GOOGLE_API_KEY=your_google_api_key
-   ```
+```
 
 5. **Add documents:**
 

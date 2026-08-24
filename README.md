@@ -1,4 +1,4 @@
-# Python RAG Application
+# Hybrid RAG-Based AI Document Assistant
 
 A Retrieval-Augmented Generation (RAG) application that allows users to ask questions about local .txt and .pdf documents.
 
@@ -57,14 +57,15 @@ The application combines keyword-based retrieval, semantic search, ensemble retr
                              ▼
                     Answer + Source Chunks
 ```
-Features
-- Supports .txt and .pdf documents.
+## Features
+
+- Supports `.txt` and `.pdf` documents.
 - Splits documents into overlapping chunks.
 - Uses BM25 for keyword-based retrieval.
-- Uses FAISS and Sentence Transformers for semantic similarity search.
-- Combines BM25 and FAISS using a weighted ensemble.
-- Uses a Cross-Encoder reranker to improve the ranking of retrieved chunks.
-- Filters weakly relevant results.
+- Uses FAISS with Sentence Transformers for semantic similarity search.
+- Combines BM25 and FAISS using weighted ensemble retrieval.
+- Uses a Cross-Encoder reranker to improve candidate ranking.
+- Filters weakly relevant results before answer generation.
 - Preserves useful context from the same source document.
 - Generates grounded answers using Google Gemini.
 - Displays retrieved source chunks and reranker scores.

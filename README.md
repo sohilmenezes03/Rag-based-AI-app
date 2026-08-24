@@ -199,50 +199,58 @@ first-rag-based-agentic-ai/
 streamlit run main.py
 ```
 
-Evaluation
+## Evaluation
 
-The project includes evaluate.py, which tests whether the retrieval pipeline returns the expected source document for a set of manually curated queries.
+The project includes `evaluate.py`, which tests whether the retrieval pipeline returns the expected source document for a set of manually curated queries.
 
 Run:
 
+```powershell
 python evaluate.py
+```
 
-Example output:
+**Example output:**
 
+```text
 Test 1
 Query: What is the monthly rent?
 Expected source: sample_rental_agreement.txt
 Retrieved sources: ['sample_rental_agreement.txt']
 Result: PASS
+```
 
-Example evaluation result:
+**Example evaluation result:**
 
+```text
 Total tests: 6
 Passed: 6
 Failed: 0
 Retrieval Accuracy: 100.00%
+```
 
-Note: This result is based on a small manually curated evaluation set of six queries. It measures source-document retrieval accuracy and should not be interpreted as overall RAG system accuracy.
+> **Note:** This result is based on a small manually curated evaluation set of six queries. It measures source-document retrieval accuracy and should not be interpreted as overall RAG system accuracy.
 
-Future Improvements
-Larger evaluation dataset.
-Answer-level evaluation.
-Support for additional document formats.
-Persistent vector storage.
-Conversation memory.
-Hybrid retrieval tuning.
-Deployment using Docker or a cloud platform.
-Key Learning Outcomes
+## Future Improvements
+
+- Larger evaluation dataset
+- Answer-level evaluation
+- Support for additional document formats
+- Persistent vector storage
+- Conversation memory
+- Hybrid retrieval tuning
+- Deployment using Docker or a cloud platform
+
+## Key Learning Outcomes
 
 This project demonstrates practical implementation of:
 
-Retrieval-Augmented Generation
-Hybrid search
-Dense vector retrieval
-Keyword-based retrieval
-FAISS indexing
-Ensemble retrieval
-Cross-Encoder reranking
+- Retrieval-Augmented Generation
+- Hybrid search
+- Dense vector retrieval
+- Keyword-based retrieval
+- FAISS indexing
+- Ensemble retrieval
+- Cross-Encoder reranking
 Document chunking
 Context selection
 LLM-based answer generation
